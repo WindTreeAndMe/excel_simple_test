@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel 文件整理打印格式</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 水平居中对齐 */
+            justify-content: center; /* 垂直居中对齐（可选） */
+            height: 100vh; /* 如果需要垂直居中，上下文高度 */
+        }
+        
+
+        h1 {
+            color: #f15a22;
+            position: absolute;
+            top: 10%;
+            width: 50%;
+            text-align: left;
+            margin: 0;
+            left: 10%;
+        }
+
+        .upload-box {
+            position: absolute;
+            bottom: 50%;
+            width: 70%;
+            margin: 0;
+            padding: 50px;
+            border: 2px dashed #777;
+            border-radius: 10px;
+            background-color: #666;
+            color: white; /* 使文字颜色更明显 */
+            font-weight: bold; /* 文字变为粗体 */
+            font-size: 1.2em; /* 可根据需要调整字体大小 */
+            text-align: center; /* 确保文字居中 */
+        }
+        
+
+        .upload-box:hover {
+            background-color: #555;
+        }
+
+        /* 隐藏默认的文件输入框 */
+        #file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Excel 文件整理打印格式</h1>
+        <div class="upload-box" onclick="triggerFileInput()">
+            点击该处或者拖动文件到任意地方
+            <div id="file-name" class="file-name"></div>
+        </div>
+    </div>
+
+    <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" id="file-input" name="file" onchange="handleFileSelection(event)">
+    </form>
+
+    <script>
+        // 点击灰色框时触发文件选择器
+        function triggerFileInput() {
+            document.getElementById('file-input').click();
+        }
+
+        // 文件选择后的处理逻辑
+        function handleFileSelection(event) {
+            const fileInput = event.target;
+            const fileName = fileInput.files[0]?.name; // 获取选择的文件名
+            const fileNameDisplay = document.getElementById('file-name');
+
+            if (fileName) {
+                // 显示选择的文件名
+                fileNameDisplay.textContent = `已选择文件：${fileName}`;
+                fileNameDisplay.classList.remove('upload-success');
+                // 自动提交表单或等待用户点击上传
+                setTimeout(() => submitForm(), 1000); // 1秒后自动提交
+            } else {
+                fileNameDisplay.textContent = ''; // 清空文件名显示
+            }
+        }
+
+        // 提交表单
+        function submitForm() {
+            document.getElementById('file-name').classList.add('upload-success');
+            document.getElementById('file-name').textContent = '文件上传成功！';
+            // 如果不想自动提交到后端，请注释掉下面的代码
+            document.getElementById('upload-form').submit();
+        }
+
+        // 阻止默认的拖拽行为
+        document.addEventListener('dragover', (event) => {
+            event.preventDefault();
+        });
+
+        document.addEventListener('drop', (event) => {
+            event.preventDefault();
+            const fileInput = document.getElementById('file-input');
+
+            // 检查是否有拖放的文件
+            if (event.dataTransfer.files.length > 0) {
+                fileInput.files = event.dataTransfer.files; // 将拖放的文件赋值到输入框
+                handleFileSelection({ target: fileInput }); // 模拟触发 onchange 事件
+            }
+        });
+    </script>
+</body>
+</html>
